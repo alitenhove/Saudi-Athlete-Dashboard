@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Activity, Gauge, Timer, Users, VenusAndMars, Zap } from "lucide-react";
+import { Activity, Gauge, Timer, UserRound, Users, Zap } from "lucide-react";
 import {
   formatForce,
   formatJump,
