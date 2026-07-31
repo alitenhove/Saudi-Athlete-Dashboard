@@ -3,17 +3,12 @@ import {
   bestSprintSeconds,
   bestVerticalJumpCm,
 } from "@/lib/utils";
+import { matchTargetSports } from "@/lib/sportMatch";
+import type { TargetSport } from "@/constants/saudi";
 
 export type FollowUpPriority = "High" | "Medium" | "Low" | "None";
 
-export type SportReferral =
-  | "Track & Field"
-  | "Soccer"
-  | "Basketball"
-  | "Rugby"
-  | "Hockey"
-  | "Multi-sport"
-  | "None";
+export type SportReferral = TargetSport | "None";
 
 export interface ThreeAttempts {
   attempt1: number | null;
@@ -40,9 +35,9 @@ export interface Athlete {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  sex: "Female" | "Male" | "Non-binary" | "Prefer not to say";
+  sex: "Female" | "Male";
   primarySport: string;
-  province: string;
+  region: string;
   heightCm: number | null;
   weightKg: number | null;
   sprint30m: ThreeAttempts;
@@ -59,6 +54,7 @@ export interface AthleteComputed extends Athlete {
   bestMidThighPull: number | null;
   fullName: string;
   ageYears: number | null;
+  matchedSports: TargetSport[];
 }
 
 export type SortKey =
@@ -67,11 +63,12 @@ export type SortKey =
   | "bestVerticalJump"
   | "bestMidThighPull"
   | "shuttleLevel"
-  | "followUp";
+  | "followUp"
+  | "sex";
 
 export type SortDir = "asc" | "desc";
 
-export function computeAthlete(athlete: Athlete): AthleteComputed {
+export function computeAthlete(athlete: Athlete): Omit<AthleteComputed, "matchedSports"> {
   return {
     ...athlete,
     fullName: `${athlete.firstName} ${athlete.lastName}`,
@@ -92,6 +89,14 @@ export function computeAthlete(athlete: Athlete): AthleteComputed {
       athlete.midThighPull.attempt3,
     ]),
   };
+}
+
+export function enrichAthletes(athletes: Athlete[]): AthleteComputed[] {
+  const base = athletes.map(computeAthlete);
+  return base.map((a) => ({
+    ...a,
+    matchedSports: matchTargetSports(a, base),
+  }));
 }
 
 function ageFromDob(dob: string): number | null {
@@ -117,9 +122,9 @@ export function createEmptyAthlete(): Athlete {
     firstName: "",
     lastName: "",
     dateOfBirth: "",
-    sex: "Prefer not to say",
+    sex: "Male",
     primarySport: "",
-    province: "",
+    region: "",
     heightCm: null,
     weightKg: null,
     sprint30m: emptyThreeAttempts(),

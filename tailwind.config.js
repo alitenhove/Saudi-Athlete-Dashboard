@@ -5,6 +5,15 @@ export default {
   theme: {
     extend: {
       colors: {
+        "sopc-green": {
+          DEFAULT: "#006923",
+          dark: "#004d19",
+          light: "#0a8a35",
+        },
+        "sopc-gold": {
+          DEFAULT: "#C9A227",
+          light: "#E8D48A",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

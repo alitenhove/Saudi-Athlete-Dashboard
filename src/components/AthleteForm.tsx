@@ -1,5 +1,10 @@
 import type { Athlete, ThreeAttempts } from "@/types/athlete";
 import {
+  CURRENT_SPORTS,
+  SAUDI_REGIONS,
+  TARGET_SPORTS,
+} from "@/constants/saudi";
+import {
   bestMidThighPullN,
   bestSprintSeconds,
   bestVerticalJumpCm,
@@ -111,7 +116,9 @@ export function AthleteForm({
   return (
     <Card className="shadow-none">
       <CardHeader>
-        <CardTitle>{editingId ? "Edit athlete record" : "Register & test athlete"}</CardTitle>
+        <CardTitle className="text-sopc-green">
+          {editingId ? "Edit athlete record" : "Register athlete"}
+        </CardTitle>
         <CardDescription>
           Enter demographics, three attempts per station (where applicable), shuttle results, and coach notes.
         </CardDescription>
@@ -172,31 +179,49 @@ export function AthleteForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {(["Female", "Male", "Non-binary", "Prefer not to say"] as const).map(
-                      (s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ),
-                    )}
+                    {(["Male", "Female"] as const).map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="province">Province / region</Label>
-                <Input
-                  id="province"
-                  value={draft.province}
-                  onChange={(e) => onChange({ ...draft, province: e.target.value })}
-                />
+                <Label>Region</Label>
+                <Select
+                  value={draft.region || undefined}
+                  onValueChange={(v) => onChange({ ...draft, region: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select region" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SAUDI_REGIONS.map((r) => (
+                      <SelectItem key={r} value={r}>
+                        {r}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <Label htmlFor="sport">Primary sport</Label>
-                <Input
-                  id="sport"
-                  value={draft.primarySport}
-                  onChange={(e) => onChange({ ...draft, primarySport: e.target.value })}
-                />
+                <Label>Current sport</Label>
+                <Select
+                  value={draft.primarySport || undefined}
+                  onValueChange={(v) => onChange({ ...draft, primarySport: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select sport" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CURRENT_SPORTS.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
@@ -350,17 +375,8 @@ export function AthleteForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {(
-                      [
-                        "None",
-                        "Track & Field",
-                        "Soccer",
-                        "Basketball",
-                        "Rugby",
-                        "Hockey",
-                        "Multi-sport",
-                      ] as const
-                    ).map((s) => (
+                    <SelectItem value="None">None</SelectItem>
+                    {TARGET_SPORTS.map((s) => (
                       <SelectItem key={s} value={s}>
                         {s}
                       </SelectItem>

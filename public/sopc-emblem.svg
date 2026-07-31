@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="SOPC emblem placeholder">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A227"/>
+      <stop offset="100%" stop-color="#E8D48A"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="56" fill="#006923" stroke="url(#g)" stroke-width="4"/>
+  <circle cx="60" cy="60" r="42" fill="none" stroke="url(#g)" stroke-width="2" opacity="0.85"/>
+  <text x="60" y="56" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#fff">SOPC</text>
+  <text x="60" y="78" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#C9A227" letter-spacing="2">KSA</text>
+</svg>

@@ -59,9 +59,24 @@ export function AthleteProfile({ athlete }: AthleteProfileProps) {
           </Badge>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          {athlete.province} · {athlete.primarySport} · Tested {athlete.eventDate}
+          {athlete.region} · {athlete.primarySport} · {athlete.sex} · Tested {athlete.eventDate}
         </p>
       </div>
+
+      <Separator />
+
+      <section>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Pathway match
+        </h3>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {athlete.matchedSports.map((s) => (
+            <Badge key={s} className="bg-sopc-green/10 text-foreground">
+              {s}
+            </Badge>
+          ))}
+        </div>
+      </section>
 
       <Separator />
 

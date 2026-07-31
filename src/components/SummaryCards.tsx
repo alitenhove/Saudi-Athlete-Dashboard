@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Activity, Gauge, Timer, Users, Zap } from "lucide-react";
+import { Activity, Gauge, Timer, Users, VenusAndMars, Zap } from "lucide-react";
 import {
   formatForce,
   formatJump,
@@ -25,6 +25,8 @@ function avg(values: (number | null)[]): number | null {
 
 export function SummaryCards({ athletes }: SummaryCardsProps) {
   const count = athletes.length;
+  const male = athletes.filter((a) => a.sex === "Male").length;
+  const female = athletes.filter((a) => a.sex === "Female").length;
   const highFollowUp = athletes.filter((a) => a.coach.followUpPriority === "High").length;
   const avgSprint = avg(athletes.map((a) => a.bestSprint30m));
   const avgJump = avg(athletes.map((a) => a.bestVerticalJump));
@@ -32,51 +34,60 @@ export function SummaryCards({ athletes }: SummaryCardsProps) {
 
   const cards = [
     {
-      title: "Athletes tested",
+      title: "Athletes screened",
       value: String(count),
-      desc: "Registered at this event session",
+      desc: "National combine cohort",
       icon: Users,
     },
     {
-      title: "High follow-up",
+      title: "Male / Female",
+      value: `${male} / ${female}`,
+      desc: "Gender breakdown",
+      icon: VenusAndMars,
+    },
+    {
+      title: "Priority follow-up",
       value: String(highFollowUp),
-      desc: "Flagged for NSO / pathway review",
+      desc: "High pathway interest",
       icon: Activity,
     },
     {
-      title: "Avg best 30m sprint",
+      title: "Avg 30m sprint",
       value: formatSprint(avgSprint),
       desc: "Speed · lower is better",
       icon: Timer,
     },
     {
-      title: "Avg best vertical jump",
+      title: "Avg vertical jump",
       value: formatJump(avgJump),
-      desc: "Power · cm",
+      desc: "Power",
       icon: Zap,
     },
     {
-      title: "Avg best IMTP",
+      title: "Avg IMTP",
       value: formatForce(avgImtp),
-      desc: "Isometric mid-thigh pull",
+      desc: "Strength",
       icon: Gauge,
     },
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       {cards.map((c) => (
-        <Card key={c.title} className="shadow-none">
+        <Card
+          key={c.title}
+          className="border-sopc-green/15 shadow-sm transition-shadow hover:shadow-md"
+        >
           <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
             <div>
-              <CardDescription className="text-xs uppercase tracking-wide">
+              <CardDescription className="text-[11px] font-medium uppercase tracking-wide text-sopc-green">
                 {c.title}
               </CardDescription>
-              <CardTitle className="mt-2 text-2xl font-semibold tabular-nums">
+              <CardTitle className="mt-2 text-2xl font-semibold tabular-nums text-foreground">
                 {c.value}
               </CardTitle>
             </div>
-            <c.icon className="h-4 w-4 text-muted-foreground" aria-hidden />
+            <c.icon className="h-4 w-4 text-sopc-gold" aria-hidden />
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">{c.desc}</p>

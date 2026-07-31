@@ -1,5 +1,6 @@
 import type { Athlete, AthleteComputed } from "@/types/athlete";
-import { computeAthlete } from "@/types/athlete";
+import { enrichAthletes } from "@/types/athlete";
+import { formatMatchedSports } from "@/lib/sportMatch";
 import {
   formatForce,
   formatJump,
@@ -24,15 +25,16 @@ function row(cells: (string | number | null | undefined)[]): string {
  * Includes raw attempts and computed best scores.
  */
 export function exportAthletesToCsv(athletes: Athlete[]): void {
-  const computed = athletes.map(computeAthlete);
+  const computed = enrichAthletes(athletes);
   const headers = [
     "Event Date",
     "First Name",
     "Last Name",
     "Date of Birth",
     "Sex",
-    "Primary Sport",
-    "Province",
+    "Current Sport",
+    "Region",
+    "Pathway Match",
     "Height (cm)",
     "Weight (kg)",
     "30m Sprint A1 (s)",
@@ -66,7 +68,8 @@ export function exportAthletesToCsv(athletes: Athlete[]): void {
         a.dateOfBirth,
         a.sex,
         a.primarySport,
-        a.province,
+        a.region,
+        formatMatchedSports(a.matchedSports),
         a.heightCm,
         a.weightKg,
         a.sprint30m.attempt1,
@@ -108,8 +111,8 @@ export function exportTestingTemplateCsv(): void {
     "Last Name",
     "Date of Birth (YYYY-MM-DD)",
     "Sex",
-    "Primary Sport",
-    "Province",
+    "Current Sport",
+    "Region (KSA)",
     "Height (cm)",
     "Weight (kg)",
     "30m Sprint Attempt 1 (s)",
@@ -149,7 +152,8 @@ function profileHtml(a: AthleteComputed): string {
     <article class="profile">
       <header>
         <h1>${a.fullName}</h1>
-        <p class="meta">${a.province} · ${a.primarySport} · Event ${a.eventDate}</p>
+        <p class="meta">${a.region} · ${a.primarySport} · Event ${a.eventDate}</p>
+        <p class="meta">Pathway: ${formatMatchedSports(a.matchedSports)}</p>
       </header>
       <section>
         <h2>Demographics</h2>
@@ -182,8 +186,12 @@ function profileHtml(a: AthleteComputed): string {
 /**
  * Opens a print-friendly window for a single athlete summary.
  */
-export function printAthleteSummary(athlete: Athlete): void {
-  const a = computeAthlete(athlete);
+export function printAthleteSummary(
+  athlete: Athlete,
+  matchedSports?: AthleteComputed["matchedSports"],
+): void {
+  const enriched = enrichAthletes([athlete])[0]!;
+  const a = matchedSports ? { ...enriched, matchedSports } : enriched;
   const w = window.open("", "_blank", "noopener,noreferrer,width=800,height=900");
   if (!w) return;
   w.document.write(`<!DOCTYPE html>
@@ -209,7 +217,7 @@ ${profileHtml(a)}
  * Printable roster of all athletes (stub-friendly: fully implemented for current session data).
  */
 export function printAllSummaries(athletes: Athlete[]): void {
-  const computed = athletes.map(computeAthlete);
+  const computed = enrichAthletes(athletes);
   const w = window.open("", "_blank", "noopener,noreferrer");
   if (!w) return;
   w.document.write(`<!DOCTYPE html>
