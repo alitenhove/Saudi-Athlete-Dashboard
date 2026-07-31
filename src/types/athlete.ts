@@ -93,10 +93,14 @@ export function computeAthlete(athlete: Athlete): Omit<AthleteComputed, "matched
 
 export function enrichAthletes(athletes: Athlete[]): AthleteComputed[] {
   const base = athletes.map(computeAthlete);
-  return base.map((a) => ({
+  const computed: AthleteComputed[] = base.map((a) => ({
     ...a,
-    matchedSports: matchTargetSports(a as AthleteComputed, base),
-  } as AthleteComputed));
+    matchedSports: [],
+  }));
+  return computed.map((a) => ({
+    ...a,
+    matchedSports: matchTargetSports(a, computed),
+  }));
 }
 
 function ageFromDob(dob: string): number | null {
