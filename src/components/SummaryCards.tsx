@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Activity, Gauge, Timer, UserRound, Users, Zap } from "lucide-react";
+import { Activity, Gauge, Timer, Users, Users2, Zap } from "lucide-react";
 import {
   formatForce,
   formatJump,
@@ -43,7 +43,7 @@ export function SummaryCards({ athletes }: SummaryCardsProps) {
       title: "Male / Female",
       value: `${male} / ${female}`,
       desc: "Gender breakdown",
-      icon: VenusAndMars,
+      icon: Users2,
     },
     {
       title: "Priority follow-up",
