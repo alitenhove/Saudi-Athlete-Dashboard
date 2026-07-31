@@ -29,6 +29,16 @@ export interface CoachNotes {
   followUpPriority: FollowUpPriority;
 }
 
+/** One row per calendar year for YoY tracking charts. */
+export interface TestHistoryPoint {
+  year: number;
+  eventDate: string;
+  bestSprint30m: number | null;
+  bestVerticalJump: number | null;
+  bestMidThighPull: number | null;
+  shuttleLevel: number | null;
+}
+
 export interface Athlete {
   id: string;
   eventDate: string;
@@ -46,6 +56,8 @@ export interface Athlete {
   shuttleRun: ShuttleRun;
   coach: CoachNotes;
   createdAt: string;
+  /** Prior combine years; latest year should align with current test scores. */
+  testHistory?: TestHistoryPoint[];
 }
 
 export interface AthleteComputed extends Athlete {
@@ -68,7 +80,9 @@ export type SortKey =
 
 export type SortDir = "asc" | "desc";
 
-export function computeAthlete(athlete: Athlete): Omit<AthleteComputed, "matchedSports"> {
+export function computeAthlete(
+  athlete: Athlete,
+): Omit<AthleteComputed, "matchedSports"> {
   return {
     ...athlete,
     fullName: `${athlete.firstName} ${athlete.lastName}`,
@@ -93,10 +107,14 @@ export function computeAthlete(athlete: Athlete): Omit<AthleteComputed, "matched
 
 export function enrichAthletes(athletes: Athlete[]): AthleteComputed[] {
   const base = athletes.map(computeAthlete);
-  return base.map((a) => ({
+  const computed: AthleteComputed[] = base.map((a) => ({
     ...a,
-    matchedSports: matchTargetSports(a as AthleteComputed, base),
-  } as AthleteComputed));
+    matchedSports: [],
+  }));
+  return computed.map((a) => ({
+    ...a,
+    matchedSports: matchTargetSports(a, computed),
+  }));
 }
 
 function ageFromDob(dob: string): number | null {

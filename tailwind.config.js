@@ -5,6 +5,20 @@ export default {
   theme: {
     extend: {
       colors: {
+        "saudi-green": {
+          DEFAULT: "#006C35",
+          dark: "#004526",
+          light: "#008045",
+        },
+        "sopc-green": {
+          DEFAULT: "#006C35",
+          dark: "#004526",
+          light: "#008045",
+        },
+        "sopc-gold": {
+          DEFAULT: "#C9A227",
+          light: "#E8D48A",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

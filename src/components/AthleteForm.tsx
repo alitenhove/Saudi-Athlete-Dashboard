@@ -116,7 +116,7 @@ export function AthleteForm({
   return (
     <Card className="shadow-none">
       <CardHeader>
-        <CardTitle className="text-sopc-green">
+        <CardTitle className="text-saudi-green">
           {editingId ? "Edit athlete record" : "Register athlete"}
         </CardTitle>
         <CardDescription>

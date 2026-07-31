@@ -1,4 +1,9 @@
-import type { Athlete, ThreeAttempts } from "@/types/athlete";
+import type { Athlete, TestHistoryPoint, ThreeAttempts } from "@/types/athlete";
+import {
+  bestMidThighPullN,
+  bestSprintSeconds,
+  bestVerticalJumpCm,
+} from "@/lib/utils";
 import {
   CURRENT_SPORTS,
   SAUDI_REGIONS,
@@ -148,6 +153,41 @@ function profileForSport(rng: () => number, sport: CurrentSport, sex: "Male" | "
   }
 }
 
+function round2(n: number) {
+  return Math.round(n * 100) / 100;
+}
+
+function buildTestHistory(
+  rng: () => number,
+  latest: TestHistoryPoint,
+): TestHistoryPoint[] {
+  const years = [2023, 2024, 2025, 2026];
+  return years.map((year) => {
+    if (year === latest.year) return { ...latest, year };
+    const steps = latest.year - year;
+    return {
+      year,
+      eventDate: `${year}-06-15`,
+      bestSprint30m:
+        latest.bestSprint30m != null
+          ? round2(latest.bestSprint30m + steps * (0.04 + rng() * 0.04))
+          : null,
+      bestVerticalJump:
+        latest.bestVerticalJump != null
+          ? round2(latest.bestVerticalJump - steps * (1.8 + rng() * 1.2))
+          : null,
+      bestMidThighPull:
+        latest.bestMidThighPull != null
+          ? round2(latest.bestMidThighPull - steps * (70 + rng() * 40))
+          : null,
+      shuttleLevel:
+        latest.shuttleLevel != null
+          ? Math.max(1, latest.shuttleLevel - steps)
+          : null,
+    };
+  });
+}
+
 function buildAthlete(index: number, rng: () => number): Athlete {
   const sex: "Male" | "Female" = index % 2 === 0 ? "Male" : "Female";
   const firstName = pick(rng, sex === "Male" ? MALE_FIRST : FEMALE_FIRST);
@@ -166,6 +206,31 @@ function buildAthlete(index: number, rng: () => number): Athlete {
   const priorities = ["High", "Medium", "Low", "None"] as const;
   const priority = pick(rng, priorities);
 
+  const sprint30m = attempts(rng, prof.sprint, 0.12);
+  const verticalJump = attempts(rng, prof.vj, 2.5);
+  const midThighPull = attempts(rng, prof.imtp, 120);
+
+  const latestHistory: TestHistoryPoint = {
+    year: 2026,
+    eventDate: "2026-06-12",
+    bestSprint30m: bestSprintSeconds([
+      sprint30m.attempt1,
+      sprint30m.attempt2,
+      sprint30m.attempt3,
+    ]),
+    bestVerticalJump: bestVerticalJumpCm([
+      verticalJump.attempt1,
+      verticalJump.attempt2,
+      verticalJump.attempt3,
+    ]),
+    bestMidThighPull: bestMidThighPullN([
+      midThighPull.attempt1,
+      midThighPull.attempt2,
+      midThighPull.attempt3,
+    ]),
+    shuttleLevel: prof.shuttle,
+  };
+
   return {
     id: `sopc-${String(index + 1).padStart(3, "0")}`,
     eventDate: "2026-06-12",
@@ -177,13 +242,14 @@ function buildAthlete(index: number, rng: () => number): Athlete {
     region,
     heightCm: Math.round(gaussian(rng, heightBase, 7)),
     weightKg: Math.round(gaussian(rng, weightBase, 9)),
-    sprint30m: attempts(rng, prof.sprint, 0.12),
-    verticalJump: attempts(rng, prof.vj, 2.5),
-    midThighPull: attempts(rng, prof.imtp, 120),
+    sprint30m,
+    verticalJump,
+    midThighPull,
     shuttleRun: {
       level: prof.shuttle,
       shuttlesAchieved: 1 + Math.floor(rng() * 8),
     },
+    testHistory: buildTestHistory(rng, latestHistory),
     coach: {
       observations: "National screening combine — standard battery completed.",
       strengths: "See testing summary and pathway matches.",

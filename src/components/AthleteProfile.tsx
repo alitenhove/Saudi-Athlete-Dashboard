@@ -1,6 +1,9 @@
 import type { AthleteComputed } from "@/types/athlete";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { AthleteResultsSummary } from "@/components/AthleteResultsSummary";
+import { AthleteProgressChart } from "@/components/AthleteProgressChart";
+import { resolveTestHistory } from "@/lib/testHistory";
 import {
   formatForce,
   formatJump,
@@ -41,48 +44,32 @@ function AttemptRow({
   );
 }
 
-function priorityVariant(p: string): "warning" | "secondary" | "outline" | "success" {
-  if (p === "High") return "warning";
-  if (p === "Medium") return "secondary";
-  if (p === "Low") return "outline";
-  return "outline";
-}
-
 export function AthleteProfile({ athlete }: AthleteProfileProps) {
+  const history = resolveTestHistory(athlete);
+
   return (
     <div className="space-y-5">
       <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="text-xl font-semibold tracking-tight">{athlete.fullName}</h2>
-          <Badge variant={priorityVariant(athlete.coach.followUpPriority)}>
-            {athlete.coach.followUpPriority} follow-up
-          </Badge>
-        </div>
+        <h2 className="text-xl font-semibold tracking-tight">{athlete.fullName}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {athlete.region} · {athlete.primarySport} · {athlete.sex} · Tested {athlete.eventDate}
+          Latest combine · {athlete.eventDate}
         </p>
       </div>
 
-      <Separator />
-
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Pathway match
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Results (matches table)
         </h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {athlete.matchedSports.map((s) => (
-            <Badge key={s} className="bg-sopc-green/10 text-foreground">
-              {s}
-            </Badge>
-          ))}
-        </div>
+        <AthleteResultsSummary athlete={athlete} />
       </section>
 
+      <AthleteProgressChart history={history} athleteName={athlete.fullName} />
+
       <Separator />
 
       <section>
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Profile
+          Additional profile
         </h3>
         <dl className="mt-2 grid gap-2 text-sm sm:grid-cols-2">
           <div>
@@ -93,23 +80,26 @@ export function AthleteProfile({ athlete }: AthleteProfileProps) {
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Sex</dt>
-            <dd>{athlete.sex}</dd>
+            <dt className="text-muted-foreground">Height / weight</dt>
+            <dd>
+              {athlete.heightCm != null ? `${athlete.heightCm} cm` : "—"} ·{" "}
+              {athlete.weightKg != null ? `${athlete.weightKg} kg` : "—"}
+            </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Height</dt>
-            <dd>{athlete.heightCm != null ? `${athlete.heightCm} cm` : "—"}</dd>
+            <dt className="text-muted-foreground">Sport referral</dt>
+            <dd>{athlete.coach.sportReferral}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Weight</dt>
-            <dd>{athlete.weightKg != null ? `${athlete.weightKg} kg` : "—"}</dd>
+            <dt className="text-muted-foreground">Record created</dt>
+            <dd>{athlete.createdAt.slice(0, 10)}</dd>
           </div>
         </dl>
       </section>
 
       <section className="space-y-3">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Testing battery
+          Testing detail (all attempts)
         </h3>
         <AttemptRow
           label="30m sprint (speed)"
@@ -146,7 +136,7 @@ export function AthleteProfile({ athlete }: AthleteProfileProps) {
 
       <section>
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Coach assessment
+          Coach evaluation
         </h3>
         <div className="mt-2 space-y-3 text-sm">
           <div>
@@ -160,10 +150,6 @@ export function AthleteProfile({ athlete }: AthleteProfileProps) {
           <div>
             <p className="font-medium text-foreground">Development areas</p>
             <p className="text-muted-foreground">{athlete.coach.developmentAreas || "—"}</p>
-          </div>
-          <div>
-            <p className="font-medium text-foreground">Sport referral</p>
-            <p className="text-muted-foreground">{athlete.coach.sportReferral}</p>
           </div>
         </div>
       </section>
